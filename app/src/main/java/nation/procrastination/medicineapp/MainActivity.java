@@ -1,5 +1,6 @@
 package nation.procrastination.medicineapp;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.menu_settings) {
-            Toast.makeText(getApplicationContext(), "Place Intent to Settings here", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.menu_about) {
             Toast.makeText(getApplicationContext(), "Place Intent to About here", Toast.LENGTH_LONG).show();
         } else if (id == R.id.menu_add) {
