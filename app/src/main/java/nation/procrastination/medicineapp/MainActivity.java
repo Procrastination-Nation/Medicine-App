@@ -10,9 +10,22 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    private LinearLayout mainLayout;
+
+    ExpandableListView expandableListView;
+    CustomListAdapter expandableListAdapter;
+    List<String> expandableListTitle;
+    HashMap<String, List<String>> expandableListDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +44,16 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+
+        expandableListView = (ExpandableListView) findViewById(R.id.mainContent);
+        expandableListDetail = getData();
+        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        expandableListAdapter = new CustomListAdapter(this, expandableListTitle, expandableListDetail);
+        expandableListView.setAdapter(expandableListAdapter);
+
+
     }
 
     @Override
@@ -57,6 +80,33 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //Dynamically generate an expandable listview for medicines
+    public HashMap<String, List<String>> getData() {
+        HashMap<String, List<String>> listItems = new HashMap<>();
+
+        /*Hardcoded values for now, in future, replace with values pulled from database or sharedpref*/
+
+        List<String> test = new ArrayList<>();
+        test.add("Days: M T W R F ");
+        test.add("Times:8:00pm");
+        test.add("Amount: 25");
+        test.add(".....");
+
+        List<String> test1 = new ArrayList<>();
+        test1.add("Hello 1");
+        test1.add("Hello 2");
+
+        List<String> test2 = new ArrayList<>();
+        test2.add("Hello 3");
+        test2.add("Hello 4");
+
+        listItems.put("Zyrtec", test);
+        listItems.put("Test Medicine", test1);
+        listItems.put("Another Test", test2);
+
+        return listItems;
     }
 
 }
