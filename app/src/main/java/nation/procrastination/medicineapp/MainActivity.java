@@ -21,11 +21,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout mainLayout;
+    public static HashMap<String, String> medIdDictionary;
 
     ExpandableListView expandableListView;
-    CustomListAdapter expandableListAdapter;
-    List<String> expandableListTitle;
+    CustomListAdapter customListAdapter;
+    List<String> expandableListHeader;
     HashMap<String, List<String>> expandableListDetail;
+    private DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +48,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mainLayout = (LinearLayout) findViewById(R.id.mainLayout);
+        dbHelper = new DBHelper(this);
 
         expandableListView = (ExpandableListView) findViewById(R.id.mainContent);
-        expandableListDetail = getData();
-        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        expandableListAdapter = new CustomListAdapter(this, expandableListTitle, expandableListDetail);
-        expandableListView.setAdapter(expandableListAdapter);
-
 
     }
 
@@ -74,9 +72,11 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.menu_about) {
-            Toast.makeText(getApplicationContext(), "Place Intent to About here", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
         } else if (id == R.id.menu_add) {
-            Toast.makeText(getApplicationContext(), "Place Intent to Add Medicine here", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(MainActivity.this, AddEditActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -85,28 +85,34 @@ public class MainActivity extends AppCompatActivity {
     //Dynamically generate an expandable listview for medicines
     public HashMap<String, List<String>> getData() {
         HashMap<String, List<String>> listItems = new HashMap<>();
+        List<MedicineInfo> medList = dbHelper.getMedicine();
+        List<String> bodyText;
+        medIdDictionary = new HashMap<>();
 
-        /*Hardcoded values for now, in future, replace with values pulled from database or sharedpref*/
-
-        List<String> test = new ArrayList<>();
-        test.add("Days: M T W R F ");
-        test.add("Times:8:00pm");
-        test.add("Amount: 25");
-        test.add(".....");
-
-        List<String> test1 = new ArrayList<>();
-        test1.add("Hello 1");
-        test1.add("Hello 2");
-
-        List<String> test2 = new ArrayList<>();
-        test2.add("Hello 3");
-        test2.add("Hello 4");
-
-        listItems.put("Zyrtec", test);
-        listItems.put("Test Medicine", test1);
-        listItems.put("Another Test", test2);
+        for(MedicineInfo med : medList) {
+            bodyText = new ArrayList<>();
+            bodyText.add(String.format("Amount: %d", med.getAmount()));
+            bodyText.add(String.format("Dosage: %d", med.getDosage()));
+            bodyText.add(String.format("Days: %s", med.getDays()));
+            bodyText.add(String.format("Times: %s", med.getTimes()));
+            listItems.put(med.getName(), bodyText);
+            medIdDictionary.put(med.getName(), String.format("%d", med.getId()));
+        }
 
         return listItems;
+    }
+
+    public void getMedicineList() {
+        expandableListDetail = getData();
+        expandableListHeader = new ArrayList<String>(expandableListDetail.keySet());
+        customListAdapter = new CustomListAdapter(this, expandableListHeader, expandableListDetail);
+        expandableListView.setAdapter(customListAdapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getMedicineList();
     }
 
 }

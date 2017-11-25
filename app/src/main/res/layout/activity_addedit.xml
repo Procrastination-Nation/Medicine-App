@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:context="nation.procrastination.medicineapp.AddEditActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/rounded_rect_back">
+
+        <ToggleButton
+            android:id="@+id/btnMonday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btnSunday"
+            android:layout_toEndOf="@+id/btnSunday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/monday"
+            android:textOn="@string/monday" />
+
+        <ToggleButton
+            android:id="@+id/btnSunday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/dosageET"
+            android:layout_below="@+id/dosageET"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/sunday"
+            android:textOn="@string/sunday" />
+
+        <EditText
+            android:id="@+id/nameET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/amountET"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/amountET"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:hint="@string/name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/dosageET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/amountET"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:ems="10"
+            android:hint="@string/dosage"
+            android:inputType="number" />
+
+        <ToggleButton
+            android:id="@+id/btnWednesday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnTuesday"
+            android:layout_alignBottom="@+id/btnTuesday"
+            android:layout_toEndOf="@+id/btnTuesday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/wednesday"
+            android:textOn="@string/wednesday" />
+
+        <EditText
+            android:id="@+id/amountET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/nameET"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:ems="10"
+            android:hint="@string/pills_left"
+            android:inputType="number" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/btnSaturday"
+            android:layout_alignStart="@+id/btnSunday"
+            android:layout_below="@+id/btnSunday"
+            android:layout_marginTop="25dp"
+            android:text="Time Placeholder (Max 3 or dynamic?)"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btnAddEditMedicine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView6"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="28dp"
+            android:onClick="btnAddEditClick"
+            android:text="@string/btn_add" />
+
+        <ToggleButton
+            android:id="@+id/btnFriday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnThursday"
+            android:layout_alignBottom="@+id/btnThursday"
+            android:layout_toEndOf="@+id/btnThursday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/friday"
+            android:textOn="@string/friday" />
+
+        <ToggleButton
+            android:id="@+id/btnSaturday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnFriday"
+            android:layout_alignBottom="@+id/btnFriday"
+            android:layout_toEndOf="@+id/btnFriday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/saturday"
+            android:textOn="@string/saturday" />
+
+        <ToggleButton
+            android:id="@+id/btnTuesday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnMonday"
+            android:layout_alignBottom="@+id/btnMonday"
+            android:layout_toEndOf="@+id/btnMonday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/tuesday"
+            android:textOn="@string/tuesday" />
+
+        <ToggleButton
+            android:id="@+id/btnThursday"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btnWednesday"
+            android:layout_alignBottom="@+id/btnWednesday"
+            android:layout_toEndOf="@+id/btnWednesday"
+            android:background="@drawable/custom_btn_toggle"
+            android:textOff="@string/thursday"
+            android:textOn="@string/thursday" />
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/dosageET"
+            android:layout_alignStart="@+id/textView6"
+            android:layout_below="@+id/btnAddEditMedicine"
+            android:textColor="@android:color/black"
+            android:textAlignment="center"
+            android:layout_marginTop="14dp" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/resultText"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/btn_delete"
+            android:onClick="btnDeleteMed"
+            android:text="@string/btn_delete" />
+    </RelativeLayout>
+
+</RelativeLayout>

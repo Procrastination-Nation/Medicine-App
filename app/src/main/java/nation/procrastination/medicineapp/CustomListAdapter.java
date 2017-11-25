@@ -1,15 +1,18 @@
 package nation.procrastination.medicineapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.Inflater;
 
 /**
  * Created by Mathieu Morin on 11/17/2017.
@@ -38,7 +41,7 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int listPosition, final int expandedListPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final String expandedListText = (String) getChild(listPosition, expandedListPosition);
+        String expandedListText = (String) getChild(listPosition, expandedListPosition);
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -71,11 +74,22 @@ public class CustomListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int listPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        String listTitle = (String) getGroup(listPosition);
+        final String listTitle = (String) getGroup(listPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.list_header, null);
         }
+        Button button = (Button) convertView.findViewById(R.id.btnView);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AddEditActivity.class);
+                int id = Integer.parseInt(MainActivity.medIdDictionary.get(listTitle)); //Get id from dictionary
+                intent.putExtra("isEdit", true);
+                intent.putExtra("id", id);
+                context.startActivity(intent);
+            }
+        });
         TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listHeaderText);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(listTitle);
