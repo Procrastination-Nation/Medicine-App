@@ -6,13 +6,36 @@
     <string name="menu_add">Add Medicine</string>
     <string name="menu_about">About</string>
     <string name="menu_help">Help</string>
-  
+
+    <!-- Settings -->
     <string name="push_notifications">Push Notifications</string>
     <string name="auto_refill">Automatically Refill Medicine</string>
     <string name="app_theme">Color Theme</string>
-  
+
     <string-array name="color_themes">
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+
+    <!-- About -->
+    <string name="about_text">This app was created by... for the Mobile Device Applications Class at.... </string>
+
+    <!-- AddEdit -->
+    <string name="name">Name</string>
+    <string name="pills_left">Pills Left</string>
+    <string name="dosage"># Per Dose </string>
+    <string name="days">Days</string>
+    <string name="Time">Time</string>
+    <string name="sunday">U</string>
+    <string name="monday">M</string>
+    <string name="tuesday">T</string>
+    <string name="wednesday">W</string>
+    <string name="thursday">R</string>
+    <string name="friday">F</string>
+    <string name="saturday">S</string>
+    <string name="btn_add">Add Medicine</string>
+    <string name="btn_edit">Update Medicine</string>
+    <string name="btn_delete">Delete Medicine</string>
+
+    <string name="view">View</string>
 </resources>
