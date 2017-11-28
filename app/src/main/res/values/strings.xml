@@ -18,7 +18,11 @@
     </string-array>
 
     <!-- About -->
-    <string name="about_text">This app was created by... for the Mobile Device Applications Class at.... </string>
+    <string name="about_text">This app was created for COP4656 Mobile Device Applications at Florida Polytechnic University
+        during the Fall 2017 semester. This app was the result of a collaboration between Mathieu Morin, Jacob Thornton &amp; Daniel Febles.</string>
+    <string name="about_purpose">The purpose of this application is to create a Medicine Reminder App to help those taking medication.
+        This app was designed to remind the user when to take their medicine, as well as notify them when they are running low.</string>
+    <string name="about_us">About Us</string>
 
     <!-- AddEdit -->
     <string name="name">Name</string>

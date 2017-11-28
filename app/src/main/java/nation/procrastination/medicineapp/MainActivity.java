@@ -2,6 +2,7 @@ package nation.procrastination.medicineapp;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,11 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +39,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        final Target target = new Target() {
+            @Override
+            public Point getPoint() {
+                // Get approximate position of home icon's center
+                int actionBarSize = toolbar.getHeight();
+                int x = toolbar.getWidth() - 200;
+                int y = actionBarSize / 2;
+                return new Point(x, y);
+            }
+        };
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_live_help);
@@ -42,8 +59,12 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Help Functionality Here", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                new ShowcaseView.Builder(MainActivity.this)
+                        .setTarget(target)
+                        .setContentTitle("Help!")
+                        .setContentText("To begin adding medicine, tap on the plus.\n\nTo find out more about us, tap on the i.\n\nTo configure app settings, tap on the gear.")
+                        .hideOnTouchOutside()
+                        .build();
             }
         });
 
