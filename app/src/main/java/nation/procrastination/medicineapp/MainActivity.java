@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     HashMap<String, List<String>> expandableListDetail;
     private DBHelper dbHelper;
 
+    FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setImageResource(R.drawable.ic_live_help);
         fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
         fab.setOnClickListener(new View.OnClickListener() {
@@ -134,6 +136,12 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         getMedicineList();
+
+        if(!medIdDictionary.isEmpty()) {
+            fab.setVisibility(View.GONE);
+        } else {
+            fab.setVisibility(View.VISIBLE);
+        }
     }
 
 }
