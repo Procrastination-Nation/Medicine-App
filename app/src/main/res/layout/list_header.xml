@@ -4,21 +4,31 @@
     android:background="@drawable/rounded_header"
     android:layout_height="60dp">
 
-    <TextView
-        android:id="@+id/listHeaderText"
-        android:layout_width="296dp"
-        android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingEnd="5dp"
-        android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
-        android:paddingTop="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.9"
+        android:layout_margin="5dp"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnView"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:focusable="false"
-        android:text="@string/view" />
+        <TextView
+            android:id="@+id/listHeaderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+            android:paddingTop="10dp"
+            android:layout_weight="1"
+            android:textColor="@android:color/black"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnView"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:focusable="false"
+            android:text="@string/view" />
+    </LinearLayout>
+
 </LinearLayout>
