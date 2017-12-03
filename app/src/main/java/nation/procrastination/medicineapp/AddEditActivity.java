@@ -158,19 +158,21 @@ public class AddEditActivity extends AppCompatActivity {
         String[] alarmTimes = info.getTimes().split(";");
         if(alarms.length != alarmTimes.length)
             return;
+        int idx = 0;
         for(String time : info.getTimes().split(";")) {
             Intent i = new Intent(AddEditActivity.this, MedicineReceiver.class);
             i.putExtra("timerMedID", info.getId());
-            int id = generateRandomID();
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, id, i, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, Integer.parseInt(alarms[idx]), i, PendingIntent.FLAG_CANCEL_CURRENT);
             Calendar c = Calendar.getInstance();
             SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
             try {
                 c.setTime(format.parse(time));
             } catch (ParseException e) {
                 e.printStackTrace();
+                idx++;
                 continue;
             }
+            idx++;
             am.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
         }
     }

@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else if (id == R.id.menu_add) {
             Intent intent = new Intent(MainActivity.this, AddEditActivity.class);
+            intent.putExtra("id", medIdDictionary.size() + 1);
             startActivity(intent);
         }
 

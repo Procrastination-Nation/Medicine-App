@@ -25,6 +25,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".AddEditActivity"></activity>
+
+        <receiver android:name=".MedicineReceiver" />
     </application>
 
 </manifest>

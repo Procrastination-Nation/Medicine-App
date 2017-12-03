@@ -21,8 +21,10 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_NAME = "name";
     private static final String KEY_AMOUNT = "amount";
     private static final String KEY_DOSAGE = "dosage";
+    private static final String KEY_ORIGINALAMOUNT = "original_amount";
     private static final String KEY_DAYS = "days";
     private static final String KEY_TIMES = "times";
+    private static final String KEY_ALARMS = "alarms";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,9 +36,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 + KEY_ID + " INTEGER PRIMARY KEY, "
                 + KEY_NAME + " TEXT, "
                 + KEY_AMOUNT + " INTEGER, "
+                + KEY_ORIGINALAMOUNT + " INTEGER, "
                 + KEY_DOSAGE + " INTEGER, "
                 + KEY_DAYS + " TEXT, "
-                + KEY_TIMES + " TEXT)";
+                + KEY_TIMES + " TEXT, "
+                + KEY_ALARMS + " TEXT)";
         db.execSQL(createTbl);
     }
 
@@ -52,10 +56,11 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, medicine.getName());
         values.put(KEY_AMOUNT, medicine.getAmount());
+        values.put(KEY_ORIGINALAMOUNT, medicine.getAmount());
         values.put(KEY_DOSAGE, medicine.getDosage());
         values.put(KEY_DAYS, medicine.getDays());
         values.put(KEY_TIMES, medicine.getTimes());
-
+        values.put(KEY_ALARMS, medicine.getAlarmIDs());
         db.insert(TABLE_NAME, null, values);
         db.close();
     }
@@ -78,7 +83,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 int dosage = cursor.getInt(cursor.getColumnIndex(KEY_DOSAGE));
                 String days = cursor.getString(cursor.getColumnIndex(KEY_DAYS));
                 String times = cursor.getString(cursor.getColumnIndex(KEY_TIMES));
-                medicineInfo = new MedicineInfo(id, name, amount, dosage, days, times);
+                String alarms = cursor.getString(cursor.getColumnIndex(KEY_ALARMS));
+                medicineInfo = new MedicineInfo(id, name, amount, dosage, days, times, alarms);
 
                 medList.add(medicineInfo);
                 cursor.moveToNext();
@@ -105,7 +111,8 @@ public class DBHelper extends SQLiteOpenHelper {
             int dosage = cursor.getInt(cursor.getColumnIndex(KEY_DOSAGE));
             String days = cursor.getString(cursor.getColumnIndex(KEY_DAYS));
             String times = cursor.getString(cursor.getColumnIndex(KEY_TIMES));
-            medicineInfo = new MedicineInfo(name, amount, dosage, days, times);
+            String alarms = cursor.getString(cursor.getColumnIndex(KEY_ALARMS));
+            medicineInfo = new MedicineInfo(name, amount, dosage, days, times, alarms);
         }
 
         cursor.close();
@@ -122,6 +129,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_DOSAGE, medicine.getDosage());
         values.put(KEY_DAYS, medicine.getDays());
         values.put(KEY_TIMES, medicine.getTimes());
+        values.put(KEY_ALARMS, medicine.getAlarmIDs());
 
         String[] args = new String[]{ String.format("%d", medicine.getId())};
         db.update(TABLE_NAME, values, String.format("%s=?", KEY_ID), args);
@@ -134,5 +142,18 @@ public class DBHelper extends SQLiteOpenHelper {
         String[] args = new String[]{ String.format("%d", medId)};
         db.delete(TABLE_NAME, String.format("%s=?", KEY_ID), args);
         db.close();
+    }
+
+    public int getMedicineOriginal(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String queryStm = "SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_ID + " = " + id;
+        Cursor cursor = db.rawQuery(queryStm, null);
+        int original = 0;
+        if(cursor.moveToFirst()) {
+            original = cursor.getInt(cursor.getColumnIndex(KEY_ORIGINALAMOUNT));
+        }
+        cursor.close();
+        db.close();
+        return original;
     }
 }
