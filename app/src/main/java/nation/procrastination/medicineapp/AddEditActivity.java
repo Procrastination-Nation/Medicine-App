@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 public class AddEditActivity extends AppCompatActivity {
@@ -161,19 +162,25 @@ public class AddEditActivity extends AppCompatActivity {
         int idx = 0;
         for(String time : info.getTimes().split(";")) {
             Intent i = new Intent(AddEditActivity.this, MedicineReceiver.class);
-            i.putExtra("timerMedID", info.getId());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, Integer.parseInt(alarms[idx]), i, PendingIntent.FLAG_CANCEL_CURRENT);
+            int alarmID = Integer.parseInt(alarms[idx]);
+            i.putExtra(getString(R.string.timer_med_id), info.getId());
+            i.putExtra(getString(R.string.timer_alarm_id), alarmID);
+            i.putExtra(getString(R.string.timer_alarm_time), time);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, alarmID, i, PendingIntent.FLAG_CANCEL_CURRENT);
             Calendar c = Calendar.getInstance();
-            SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+            SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
             try {
-                c.setTime(format.parse(time));
+                idx++;
+                Date d = format.parse(time);
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(d);
+                c.set(Calendar.HOUR_OF_DAY, c2.get(Calendar.HOUR_OF_DAY));
+                c.set(Calendar.MINUTE, c2.get(Calendar.MINUTE));
+                am.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
             } catch (ParseException e) {
                 e.printStackTrace();
-                idx++;
                 continue;
             }
-            idx++;
-            am.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
         }
     }
 
