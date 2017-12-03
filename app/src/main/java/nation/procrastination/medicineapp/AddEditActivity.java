@@ -1,15 +1,32 @@
 package nation.procrastination.medicineapp;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 public class AddEditActivity extends AppCompatActivity {
 
@@ -26,10 +43,16 @@ public class AddEditActivity extends AppCompatActivity {
     private TextView resultText;
     private Button btnAddEdit;
     private Button btnDelete;
+    private Button btnEditTime;
+    private ListView viewMedTimes;
     DBHelper dbHelper;
 
     private boolean isEdit;
     private int medId;
+    private ArrayList<String> times;
+    private ArrayAdapter<String> adapter;
+    private int selectedString = -1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +72,15 @@ public class AddEditActivity extends AppCompatActivity {
         resultText = (TextView) findViewById(R.id.resultText);
         btnAddEdit = (Button) findViewById(R.id.btnAddEditMedicine);
         btnDelete = (Button) findViewById(R.id.btnDelete);
+        btnEditTime = (Button) findViewById(R.id.btnEditTime);
+
+        viewMedTimes = (ListView) findViewById(R.id.medTimesList);
+
+        times = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.list_item_time, times);
+        viewMedTimes.setOnItemClickListener(mClickListener);
+        viewMedTimes.setAdapter(adapter);
+        btnEditTime.setVisibility(View.GONE);
 
         Intent intent = getIntent();
         isEdit = intent.getBooleanExtra("isEdit", false);
@@ -65,6 +97,21 @@ public class AddEditActivity extends AppCompatActivity {
         }
     }
 
+    public void btnAddTime(View view) {
+        TimePickerDialog dialog = new TimePickerDialog(this, mTimeListener, 0, 0, false);
+        dialog.show();
+    }
+
+    public void btnRemoveTime(View view) {
+        if(selectedString == -1) return;
+        times.remove(selectedString);
+        adapter.notifyDataSetChanged();
+    }
+
+    public void btnEditTime(View view) {
+        TimePickerDialog dialog = new TimePickerDialog(this, mEditListener, 0, 0, false);
+        dialog.show();
+    }
 
     public void btnAddEditClick(View view) {
         try {
@@ -72,14 +119,21 @@ public class AddEditActivity extends AppCompatActivity {
             int amount = Integer.parseInt(amountET.getText().toString());
             int dosage = Integer.parseInt(dosageET.getText().toString());
             String days = generateBtnString();
-            String times = "";
+            String times = generateTimeString();
+            String alarmIDs = generateAlarmStrings();
+
+            Toast.makeText(getApplicationContext(), times, Toast.LENGTH_SHORT).show();
 
             if(!isEdit) {
-                MedicineInfo medicineInfo = new MedicineInfo(name, amount, dosage, days, times);
+                MedicineInfo medicineInfo = new MedicineInfo(medId, name, amount, dosage, days, times, alarmIDs);
                 dbHelper.addMedicine(medicineInfo);
                 resultText.setText(String.format("%s has been successfully added!", name));
+                setMedicineTimer(medicineInfo);
+
             } else {
-                MedicineInfo medicineInfo = new MedicineInfo(medId, name, amount, dosage, days, times);
+                MedicineInfo medicineInfo = new MedicineInfo(medId, name, amount, dosage, days, times, alarmIDs);
+                clearMedicineTimer(medicineInfo);
+                setMedicineTimer(medicineInfo);
                 dbHelper.updateMedicine(medicineInfo);
                 resultText.setText(String.format("%s has been successfully updated!", name));
             }
@@ -89,6 +143,87 @@ public class AddEditActivity extends AppCompatActivity {
             resultText.setText("Failed to add medicine.");
         }
     }
+
+    private int generateRandomID() {
+        UUID one = UUID.randomUUID();
+        String str = "" + one;
+        int uid = str.hashCode();
+        String filter = "" + uid;
+        str = filter.replaceAll("-", "");
+        return Integer.parseInt(str);
+    }
+
+    private void setMedicineTimer(MedicineInfo info) {
+        AlarmManager am = (AlarmManager)getSystemService(ALARM_SERVICE);
+        String[] alarms = info.getAlarmIDs().split(";");
+        String[] alarmTimes = info.getTimes().split(";");
+        if(alarms.length != alarmTimes.length)
+            return;
+        int idx = 0;
+        for(String time : info.getTimes().split(";")) {
+            Intent i = new Intent(AddEditActivity.this, MedicineReceiver.class);
+            int alarmID = Integer.parseInt(alarms[idx]);
+            i.putExtra(getString(R.string.timer_med_id), info.getId());
+            i.putExtra(getString(R.string.timer_alarm_id), alarmID);
+            i.putExtra(getString(R.string.timer_alarm_time), time);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, alarmID, i, PendingIntent.FLAG_CANCEL_CURRENT);
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat format = new SimpleDateFormat(getString(R.string.date_format));
+            try {
+                idx++;
+                Date d = format.parse(time);
+                Calendar c2 = Calendar.getInstance();
+                c2.setTime(d);
+                c.set(Calendar.HOUR_OF_DAY, c2.get(Calendar.HOUR_OF_DAY));
+                c.set(Calendar.MINUTE, c2.get(Calendar.MINUTE));
+                am.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                continue;
+            }
+        }
+    }
+
+    private void clearMedicineTimer(MedicineInfo info) {
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        for(String alarm : info.getAlarmIDs().split(";")) {
+            Intent i = new Intent(AddEditActivity.this, MedicineReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(AddEditActivity.this, Integer.parseInt(alarm), i, PendingIntent.FLAG_CANCEL_CURRENT);
+            am.cancel(pendingIntent);
+        }
+    }
+
+    TimePickerDialog.OnTimeSetListener mTimeListener = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            c.set(Calendar.MINUTE, minute);
+            times.add(format.format(c.getTime()));
+            adapter.notifyDataSetChanged();
+        }
+    };
+
+    TimePickerDialog.OnTimeSetListener mEditListener = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+            Calendar c = Calendar.getInstance();
+            c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            c.set(Calendar.MINUTE, minute);
+            times.set(selectedString, format.format(c.getTime()));
+            adapter.notifyDataSetChanged();
+        }
+    };
+    ListView.OnItemClickListener mClickListener = new ListView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectedString = position;
+            if(selectedString != -1) btnEditTime.setVisibility(View.VISIBLE);
+        }
+    };
 
     private String generateBtnString() {
         String days = "";
@@ -102,6 +237,25 @@ public class AddEditActivity extends AppCompatActivity {
         if(btnSaturday.isChecked()) { days += "S"; }
 
         return days;
+    }
+
+    private String generateTimeString() {
+        String ret = "";
+        boolean one = times.size() == 1;
+        for(String time : times) {
+            ret += time;
+            if(!one) ret += ";";
+        }
+        return ret;
+    }
+
+    private String generateAlarmStrings() {
+        String ret = "";
+        for(String time : times) {
+            ret += generateRandomID();
+            ret += ";";
+        }
+        return ret;
     }
 
     private void crackBtnString(String days) {
@@ -138,6 +292,10 @@ public class AddEditActivity extends AppCompatActivity {
         amountET.setText(String.format("%d", med.getAmount()));
         dosageET.setText(String.format("%d", med.getDosage()));
         crackBtnString(med.getDays());
+        for(String time : med.getTimes().split(";")) {
+            this.times.add(time);
+        }
+        adapter.notifyDataSetChanged();
     }
 
     public void btnDeleteMed(View view) {
@@ -147,6 +305,7 @@ public class AddEditActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        clearMedicineTimer(dbHelper.getMedicineByID(medId));
                         dbHelper.deleteMedicine(medId);
                         finish();
                     }

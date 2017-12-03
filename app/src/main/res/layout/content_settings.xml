@@ -25,7 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/textView"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="40dp" />
+        android:layout_marginEnd="40dp"
+        android:checked="true" />
 
     <TextView
         android:id="@+id/textView2"
@@ -44,20 +45,4 @@
         android:layout_alignBottom="@+id/textView2"
         android:layout_alignStart="@+id/pushNotif" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/textView2"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="48dp"
-        android:text="@string/app_theme"
-        android:textSize="18sp" />
-
-    <Spinner
-        android:id="@+id/colorTheme"
-        android:layout_width="150sp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView3"
-        android:layout_alignEnd="@+id/refillMeds" />
 </RelativeLayout>
