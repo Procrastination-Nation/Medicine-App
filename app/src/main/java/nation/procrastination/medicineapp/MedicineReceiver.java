@@ -1,5 +1,6 @@
 package nation.procrastination.medicineapp;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,11 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by jakei_000 on 11/28/2017.
@@ -24,7 +30,10 @@ public class MedicineReceiver extends BroadcastReceiver {
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
         helper = new DBHelper(context);
-        int medID = intent.getIntExtra("timerMedID", -1);
+        int medID = intent.getIntExtra(context.getString(R.string.timer_med_id), -1);
+        if(medID == -1) return;
+        int alarmID = intent.getIntExtra(context.getString(R.string.timer_alarm_id), -1);
+        String timeString = intent.getStringExtra(context.getString(R.string.timer_alarm_time));
         boolean refill = false;
         MedicineInfo info = helper.getMedicineByID(medID);
         int amt = info.getAmount();
@@ -46,7 +55,10 @@ public class MedicineReceiver extends BroadcastReceiver {
         helper.updateMedicine(info);
         String medName = helper.getMedicineByID(medID).getName();
         String notificationMessage = (!refill) ? "It is time to take " + medName : "It is time to take and refill " + medName;
-        if(preferences.getBoolean("MEDICINE_REFILL", true) && refill) {
+        if(!refill) {
+            resetTimer(context, medID, alarmID, timeString);
+        }
+        else if(preferences.getBoolean("MEDICINE_REFILL", false) && refill) {
             notificationMessage = "It is time to take " + medName + "(AUTOREFILL)";
             info = new MedicineInfo(
                     medID,
@@ -57,8 +69,10 @@ public class MedicineReceiver extends BroadcastReceiver {
                     info.getTimes(),
                     info.getAlarmIDs()
             );
+            resetTimer(context, medID, alarmID, timeString);
             helper.updateMedicine(info);
         }
+
         Intent notificationIntent = new Intent(context, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -66,8 +80,6 @@ public class MedicineReceiver extends BroadcastReceiver {
                 notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-
         boolean push = preferences.getBoolean("MEDICINE_NOTIFY", true);
         if(push) {
             NotificationCompat.Builder mNotifyBuilder = (android.support.v7.app.NotificationCompat.Builder)
@@ -79,6 +91,25 @@ public class MedicineReceiver extends BroadcastReceiver {
                             .setContentIntent(pendingIntent);
             notificationManager.notify(MID, mNotifyBuilder.build());
             MID++;
+        }
+    }
+    private void resetTimer(Context context, int medID, int alarmID, String time) {
+        if(medID == -1 || alarmID == -1 || time.length() < 1) return;
+        Intent alarmIntent = new Intent(context, MedicineReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmID, alarmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat(context.getString(R.string.date_format));
+        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        try {
+            Date d = format.parse(time);
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(d);
+            c.set(Calendar.HOUR_OF_DAY, c2.get(Calendar.HOUR_OF_DAY));
+            c.set(Calendar.MINUTE, c2.get(Calendar.MINUTE));
+            am.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+        } catch (ParseException e) {
+            e.printStackTrace();
+
         }
     }
 }
